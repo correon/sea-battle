@@ -7,3 +7,4 @@ function getRandomFromArray(arr) {
 }
 
 export {getRandom, getRandomFromArray};
+// test commit
