@@ -1,13 +1,17 @@
 {
   "name": "sea-battle",
   "version": "1.0.0",
-  "private": true,
+  "description": "",
+  "source": "src/index.html",
+  "type": "module",
   "scripts": {
-    "start": "webpack-dev-server",
-    "build": "webpack"
+    "start": "parcel",
+    "build": "parcel build"
   },
+  "keywords": [],
+  "author": "Rinat Riyanov",
+  "license": "ISC",
   "devDependencies": {
-    "webpack": "^2.6.1",
-    "webpack-dev-server": "^2.4.5"
+    "parcel": "^2.2.1"
   }
 }
