@@ -1,6 +1,9 @@
 import Game from './game';
 
 class Ship {
+  static verticalDirectionId = 0;
+  static horizontalDirectionId = 1;
+
   constructor(type, playerGrid, player) {
     this.damage = 0;
     this.type = type;
@@ -8,34 +11,34 @@ class Ship {
     this.player = player;
 
     switch (this.type) {
-      case Game.commonData.availableShips[0]:
+      case Game.availableShips[0]:
         this.shipLength = 4;
         break;
-      case Game.commonData.availableShips[1]:
+      case Game.availableShips[1]:
         this.shipLength = 3;
         break;
-      case Game.commonData.availableShips[2]:
+      case Game.availableShips[2]:
         this.shipLength = 3;
         break;
-      case Game.commonData.availableShips[3]:
+      case Game.availableShips[3]:
         this.shipLength = 2;
         break;
-      case Game.commonData.availableShips[4]:
+      case Game.availableShips[4]:
         this.shipLength = 2;
         break;
-      case Game.commonData.availableShips[5]:
+      case Game.availableShips[5]:
         this.shipLength = 2;
         break;
-      case Game.commonData.availableShips[6]:
+      case Game.availableShips[6]:
         this.shipLength = 1;
         break;
-      case Game.commonData.availableShips[7]:
+      case Game.availableShips[7]:
         this.shipLength = 1;
         break;
-      case Game.commonData.availableShips[8]:
+      case Game.availableShips[8]:
         this.shipLength = 1;
         break;
-      case Game.commonData.availableShips[9]:
+      case Game.availableShips[9]:
         this.shipLength = 1;
         break;
     }
@@ -44,104 +47,70 @@ class Ship {
     this.sunk = false;
   }
 
-  isLegal(x, y, direction) {
-    if (this.withinBounds(x, y, direction)) {
-      for (let i = 0; i < this.shipLength; i++) {
-        if (direction === Ship.verticalDirection) {
-          if (
-            this.playerGrid.cells[x + i][y] === Game.commonData.cellType.miss ||
-            this.playerGrid.cells[x + i][y] === Game.commonData.cellType.ship ||
-            (y + i + 1 < 10 &&
-              this.playerGrid.cells[x][y + 1] ===
-                Game.commonData.cellType.ship) ||
-            (y + i - 1 >= 0 &&
-              this.playerGrid.cells[x][y - 1] ===
-                Game.commonData.cellType.ship) ||
-            (x + i + 1 < 10 &&
-              this.playerGrid.cells[x + i + 1][y] ===
-                Game.commonData.cellType.ship) ||
-            (x + i + 1 < 10 &&
-              y + 1 < 10 &&
-              this.playerGrid.cells[x + i + 1][y + 1] ===
-                Game.commonData.cellType.ship) ||
-            (x + i + 1 < 10 &&
-              y - 1 >= 0 &&
-              this.playerGrid.cells[x + i + 1][y - 1] ===
-                Game.commonData.cellType.ship) ||
-            (x + i - 1 >= 0 &&
-              this.playerGrid.cells[x + i - 1][y] ===
-                Game.commonData.cellType.ship) ||
-            (x + i - 1 >= 0 &&
-              y + 1 < 10 &&
-              this.playerGrid.cells[x + i - 1][y + 1] ===
-                Game.commonData.cellType.ship) ||
-            (x + i - 1 >= 0 &&
-              y - 1 >= 0 &&
-              this.playerGrid.cells[x + i - 1][y - 1] ===
-                Game.commonData.cellType.ship) ||
-            this.playerGrid.cells[x + i][y] === Game.commonData.cellType.sunk
-          ) {
-            return false;
-          }
-        } else {
-          if (
-            this.playerGrid.cells[x][y + i] === Game.commonData.cellType.miss ||
-            this.playerGrid.cells[x][y + i] === Game.commonData.cellType.ship ||
-            (x + 1 < 10 &&
-              this.playerGrid.cells[x + 1][y] ===
-                Game.commonData.cellType.ship) ||
-            (x - 1 >= 0 &&
-              this.playerGrid.cells[x - 1][y] ===
-                Game.commonData.cellType.ship) ||
-            (y + i + 1 < 10 &&
-              this.playerGrid.cells[x][y + i + 1] ===
-                Game.commonData.cellType.ship) ||
-            (y + i + 1 < 10 &&
-              x + 1 < 10 &&
-              this.playerGrid.cells[x + 1][y + i + 1] ===
-                Game.commonData.cellType.ship) ||
-            (y + i + 1 < 10 &&
-              x - 1 >= 0 &&
-              this.playerGrid.cells[x - 1][y + i + 1] ===
-                Game.commonData.cellType.ship) ||
-            (y + i - 1 >= 0 &&
-              this.playerGrid.cells[x][y + i - 1] ===
-                Game.commonData.cellType.ship) ||
-            (y + i - 1 >= 0 &&
-              x + 1 < 10 &&
-              this.playerGrid.cells[x + 1][y + i - 1] ===
-                Game.commonData.cellType.ship) ||
-            (y + i - 1 >= 0 &&
-              x - 1 >= 0 &&
-              this.playerGrid.cells[x - 1][y + i - 1] ===
-                Game.commonData.cellType.ship) ||
-            this.playerGrid.cells[x][y + i] === Game.commonData.cellType.sunk
-          ) {
-            return false;
-          }
-        }
+  isPlacingOnExistingShip(x, y, i, direction) {
+    const cells = this.playerGrid.cells;
+    const ship = Game.cellType.ship;
+
+    if (direction === Ship.verticalDirectionId) {
+      if (
+        cells[x + i][y] === ship ||
+        (y + i + 1 < 10 && cells[x][y + 1] === ship) ||
+        (y + i - 1 >= 0 && cells[x][y - 1] === ship) ||
+        (x + i + 1 < 10 && cells[x + i + 1][y] === ship) ||
+        (x + i + 1 < 10 && y + 1 < 10 && cells[x + i + 1][y + 1] === ship) ||
+        (x + i + 1 < 10 && y - 1 >= 0 && cells[x + i + 1][y - 1] === ship) ||
+        (x + i - 1 >= 0 && cells[x + i - 1][y] === ship) ||
+        (x + i - 1 >= 0 && y + 1 < 10 && cells[x + i - 1][y + 1] === ship) ||
+        (x + i - 1 >= 0 && y - 1 >= 0 && cells[x + i - 1][y - 1] === ship)
+      ) {
+        return true;
       }
-      return true;
     } else {
-      return false;
+      if (
+        cells[x][y + i] === ship ||
+        (x + 1 < 10 && cells[x + 1][y] === ship) ||
+        (x - 1 >= 0 && cells[x - 1][y] === ship) ||
+        (y + i + 1 < 10 && cells[x][y + i + 1] === ship) ||
+        (y + i + 1 < 10 && x + 1 < 10 && cells[x + 1][y + i + 1] === ship) ||
+        (y + i + 1 < 10 && x - 1 >= 0 && cells[x - 1][y + i + 1] === ship) ||
+        (y + i - 1 >= 0 && cells[x][y + i - 1] === ship) ||
+        (y + i - 1 >= 0 && x + 1 < 10 && cells[x + 1][y + i - 1] === ship) ||
+        (y + i - 1 >= 0 && x - 1 >= 0 && cells[x - 1][y + i - 1] === ship)
+      ) {
+        return true;
+      }
     }
+
+    return false;
   }
 
-  withinBounds(x, y, direction) {
-    if (direction === Ship.verticalDirection) {
-      return x + this.shipLength <= 10;
-    } else {
-      return y + this.shipLength <= 10;
+  isPlacementAllowed(x, y, direction) {
+    if (!this.isWithinBounds(x, y, direction)) return false;
+
+    for (let i = 0; i < this.shipLength; i++) {
+      if (this.isPlacingOnExistingShip(x, y, i, direction)) {
+        return false;
+      }
     }
+
+    return true;
+  }
+
+  isWithinBounds(x, y, direction) {
+    if (direction === Ship.verticalDirectionId) {
+      return x + this.shipLength <= 10;
+    }
+
+    return y + this.shipLength <= 10;
   }
 
   getAllShipCells() {
     let resultObject = [];
     for (var i = 0; i < this.shipLength; i++) {
-      if (this.direction === Ship.verticalDirection) {
-        resultObject[i] = {x: this.xPosition + i, y: this.yPosition};
+      if (this.direction === Ship.verticalDirectionId) {
+        resultObject[i] = { x: this.xPosition + i, y: this.yPosition };
       } else {
-        resultObject[i] = {x: this.xPosition, y: this.yPosition + i};
+        resultObject[i] = { x: this.xPosition, y: this.yPosition + i };
       }
     }
     return resultObject;
@@ -152,13 +121,13 @@ class Ship {
     this.yPosition = y;
     this.direction = direction;
 
-    if (!temporary) {
-      for (var i = 0; i < this.shipLength; i++) {
-        if (this.direction === Ship.verticalDirection) {
-          this.playerGrid.cells[x + i][y] = Game.commonData.cellType.ship;
-        } else {
-          this.playerGrid.cells[x][y + i] = Game.commonData.cellType.ship;
-        }
+    if (temporary) return;
+
+    for (var i = 0; i < this.shipLength; i++) {
+      if (this.direction === Ship.verticalDirectionId) {
+        this.playerGrid.cells[x + i][y] = Game.cellType.ship;
+      } else {
+        this.playerGrid.cells[x][y + i] = Game.cellType.ship;
       }
     }
   }
@@ -171,9 +140,9 @@ class Ship {
     this.damage = this.maxDamage;
     this.sunk = true;
 
-    var allCells = this.getAllShipCells();
+    const allCells = this.getAllShipCells();
 
-    for (var i = 0; i < this.shipLength; i++) {
+    for (let i = 0; i < this.shipLength; i++) {
       this.playerGrid.updateCell(
         allCells[i].x,
         allCells[i].y,
@@ -186,16 +155,11 @@ class Ship {
   incrementDamage() {
     this.damage++;
 
-    if (this.isSunk()) {
-      this.sinkShip();
-      return Game.commonData.cellType.sunk;
-    }
+    if (!this.isSunk()) return Game.cellType.hit;
 
-    return Game.commonData.cellType.hit;
+    this.sinkShip();
+    return Game.cellType.sunk;
   }
 }
-
-Ship.verticalDirection = 0;
-Ship.horizontalDirection = 1;
 
 export default Ship;

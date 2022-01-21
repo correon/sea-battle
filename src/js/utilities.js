@@ -6,5 +6,4 @@ function getRandomFromArray(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-export {getRandom, getRandomFromArray};
-// test commit
+export { getRandom, getRandomFromArray };
