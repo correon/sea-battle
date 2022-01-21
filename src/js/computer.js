@@ -1,7 +1,11 @@
-import {getRandom, getRandomFromArray} from './utilities';
+import { getRandom, getRandomFromArray } from './utilities';
 import Game from './game';
 
 class Computer {
+  static damagedShipCoordsX = [];
+  static damagedShipCoordsY = [];
+  static sunkShipsAreaCoords = [];
+
   constructor(game) {
     this.game = game;
     this.hasDamagedShip = false;
@@ -20,24 +24,24 @@ class Computer {
     let cells = [];
 
     if (x - 1 >= 0) {
-      cells.push({xPos: x - 1, yPos: y});
+      cells.push({ xPos: x - 1, yPos: y });
       if (y - 1 >= 0) {
-        cells.push({xPos: x, yPos: y - 1});
-        cells.push({xPos: x - 1, yPos: y - 1});
+        cells.push({ xPos: x, yPos: y - 1 });
+        cells.push({ xPos: x - 1, yPos: y - 1 });
       }
       if (y + 1 < 10) {
-        cells.push({xPos: x, yPos: y + 1});
-        cells.push({xPos: x - 1, yPos: y + 1});
+        cells.push({ xPos: x, yPos: y + 1 });
+        cells.push({ xPos: x - 1, yPos: y + 1 });
       }
     }
 
     if (x + 1 < 10) {
-      cells.push({xPos: x + 1, yPos: y});
+      cells.push({ xPos: x + 1, yPos: y });
       if (y - 1 >= 0) {
-        cells.push({xPos: x + 1, yPos: y - 1});
+        cells.push({ xPos: x + 1, yPos: y - 1 });
       }
       if (y + 1 < 10) {
-        cells.push({xPos: x + 1, yPos: y + 1});
+        cells.push({ xPos: x + 1, yPos: y + 1 });
       }
     }
 
@@ -49,10 +53,7 @@ class Computer {
     let y = null;
     let result = null;
 
-    while (
-      Game.gameOver === false &&
-      result !== Game.commonData.cellType.miss
-    ) {
+    while (Game.gameOver === false && result !== Game.cellType.miss) {
       if (this.hasDamagedShip) {
         let randomDirection = null;
         let randomValue = null;
@@ -110,11 +111,15 @@ class Computer {
       if (this.isSunkShipAreaCell(x, y)) {
         continue;
       }
-      result = this.game.shoot(x, y, Game.commonData.player);
+      if (x === null || y === null) {
+        x = getRandom(0, 9);
+        y = getRandom(0, 9);
+      }
+      result = this.game.shoot(x, y, Game.playerId);
 
-      if (result === Game.commonData.cellType.hit) {
+      if (result === Game.cellType.hit) {
         this.hasDamagedShip = true;
-      } else if (result === Game.commonData.cellType.sunk) {
+      } else if (result === Game.cellType.sunk) {
         for (let i = 0; i < Computer.damagedShipCoordsX.length; i++) {
           let cellsToPush = this.getCellsAround(
             Computer.damagedShipCoordsX[i],
@@ -132,9 +137,5 @@ class Computer {
     }
   }
 }
-
-Computer.damagedShipCoordsX = [];
-Computer.damagedShipCoordsY = [];
-Computer.sunkShipsAreaCoords = [];
 
 export default Computer;
