@@ -13,57 +13,33 @@ class Field {
       this.cells[i] = row;
 
       for (let j = 0; j < this.size; j++) {
-        row.push(Game.commonData.cellType.empty);
+        row.push(Game.cellType.empty);
       }
     }
   }
 
   updateCell(x, y, type, targetPlayer) {
-    let player = '';
-    if (targetPlayer === Game.commonData.player) {
-      player = 'human-player';
-    } else if (targetPlayer === Game.commonData.computer) {
-      player = 'computer-player';
-    }
+    const player =
+      targetPlayer === Game.playerId ? 'human-player' : 'computer-player';
 
-    switch (type) {
-      case 'empty':
-        this.cells[x][y] = Game.commonData.cellType.empty;
-        break;
-      case 'ship':
-        this.cells[x][y] = Game.commonData.cellType.ship;
-        break;
-      case 'miss':
-        this.cells[x][y] = Game.commonData.cellType.miss;
-        break;
-      case 'hit':
-        this.cells[x][y] = Game.commonData.cellType.hit;
-        break;
-      case 'sunk':
-        this.cells[x][y] = Game.commonData.cellType.sunk;
-        break;
-      default:
-        this.cells[x][y] = Game.commonData.cellType.empty;
-        break;
-    }
-
+    this.cells[x][y] = Game.cellType[type];
     document
       .querySelector(`.${player} [data-x="${x}"][data-y="${y}"]`)
       .classList.add('grid-cell', `grid-${type}`);
   }
 
   isMiss(x, y) {
-    return this.cells[x][y] === Game.commonData.cellType.miss;
+    return this.cells[x][y] === Game.cellType.miss;
   }
 
   isUndamagedShip(x, y) {
-    return this.cells[x][y] === Game.commonData.cellType.ship;
+    return this.cells[x][y] === Game.cellType.ship;
   }
 
   isDamagedShip(x, y) {
     return (
-      this.cells[x][y] === Game.commonData.cellType.hit ||
-      this.cells[x][y] === Game.commonData.cellType.sunk
+      this.cells[x][y] === Game.cellType.hit ||
+      this.cells[x][y] === Game.cellType.sunk
     );
   }
 }
