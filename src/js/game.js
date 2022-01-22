@@ -33,6 +33,16 @@ class Game {
   };
 
   constructor() {
+    this.fleetClickHandler = this.fleetClickHandler.bind(this);
+    this.shootHandler = this.shootHandler.bind(this);
+    this.placingHandler = this.placingHandler.bind(this);
+    this.positioningMouseoverHandler =
+      this.positioningMouseoverHandler.bind(this);
+    this.positioningMouseoutHandler =
+      this.positioningMouseoutHandler.bind(this);
+    this.toggleRotationHandler = this.toggleRotationHandler.bind(this);
+    this.startGameHandler = this.startGameHandler.bind(this);
+
     this.init();
   }
 
@@ -44,52 +54,51 @@ class Game {
     this.computer = new Computer(this);
     this.readyToPlay = false;
     this.placingOnGrid = false;
+
     this.drawBattlefields();
+    this.setupEventListeneres();
+    this.computerFleet.placeComputerShipsRandomly();
+  }
 
-    const fleetList = document
-      .querySelector('.fleet-list')
-      .querySelectorAll('li');
-    const computerCells = document.querySelector('.computer-player').childNodes;
-    const playerCells = document.querySelector('.human-player').childNodes;
+  setupEventListeneres() {
+    const computerField = document.querySelector('.computer-player');
+    const humanField = document.querySelector('.human-player');
+    const fleetList = document.querySelector('.fleet-list');
 
-    for (let ship of fleetList) {
-      ship.addEventListener('click', this.fleetClickHandler.bind(this), false);
-    }
+    computerField.addEventListener('click', (e) => {
+      if (e.target.classList.contains('grid-cell')) {
+        this.shootHandler(e);
+      }
+    });
 
-    for (let computerCell of computerCells) {
-      computerCell.addEventListener(
-        'click',
-        this.shootHandler.bind(this),
-        false
-      );
-    }
+    humanField.addEventListener('click', (e) => {
+      if (e.target.classList.contains('grid-cell')) {
+        this.placingHandler(e);
+      }
+    });
+    humanField.addEventListener('mouseover', (e) => {
+      if (e.target.classList.contains('grid-cell')) {
+        this.positioningMouseoverHandler(e);
+      }
+    });
+    humanField.addEventListener('mouseout', (e) => {
+      if (e.target.classList.contains('grid-cell')) {
+        this.positioningMouseoutHandler(e);
+      }
+    });
 
-    for (let playerCell of playerCells) {
-      playerCell.addEventListener(
-        'click',
-        this.placingHandler.bind(this),
-        false
-      );
-      playerCell.addEventListener(
-        'mouseover',
-        this.positioningMouseoverHandler.bind(this),
-        false
-      );
-      playerCell.addEventListener(
-        'mouseout',
-        this.positioningMouseoutHandler.bind(this),
-        false
-      );
-    }
+    fleetList.addEventListener('click', (e) => {
+      if (Game.availableShips.includes(e.target.id)) {
+        this.fleetClickHandler(e);
+      }
+    });
 
     document
       .getElementById('rotate-button')
-      .addEventListener('click', this.toggleRotationHandler, false);
+      .addEventListener('click', this.toggleRotationHandler);
     document
       .getElementById('start-game')
-      .addEventListener('click', this.startGameHandler.bind(this), false);
-
-    this.computerFleet.placeComputerShipsRandomly();
+      .addEventListener('click', this.startGameHandler);
   }
 
   drawBattlefields() {
@@ -265,10 +274,10 @@ class Game {
 
   checkForGameOver() {
     if (this.computerFleet.isAllShipsSunk()) {
-      alert('Поздравляю, вы победили!');
+      alert('Congratulations, you have won!');
       Game.gameOver = true;
     } else if (this.playerFleet.isAllShipsSunk()) {
-      alert('К сожалению, вы проиграли. Компьютер потопил все ваши корабли');
+      alert('You have lost. Computer sunk all your ships');
       Game.gameOver = true;
     }
   }
